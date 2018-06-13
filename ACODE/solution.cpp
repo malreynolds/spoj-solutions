@@ -1,46 +1,38 @@
 #include <iostream>
-#include <unordered_map>
+#include <vector>
 #include <string>
 
 using namespace std;
 
-unordered_map<string, int> dp;
-
-int cnt(string s) {
-    if (dp[s]) return dp[s];
-    string left = s.substr(0, s.size() - 1);
-    string right = s.substr(1, s.size() - 1);
-    string common = s.substr(1, s.size() - 2);
-    // cout << left << " " << dp[left] << endl;
-    // cout << right << " " << dp[right] << endl;
-    dp[s] = cnt(left) + cnt(right) - cnt(common);
-    cout << left << " " << right << " " << common << " " << dp[left] << " " << dp[right] << " " << dp[common] << " " << s << " " << dp[s] << endl;
-    // cout << s << " " << dp[s] << endl;
-    return dp[s];
-}
-
 int main() {
-    for (int i = 1; i <= 9; i++) {
-        dp[to_string(i)] = 1;
-    }
-
-    dp["10"] = 1; dp["20"] = 1;
-    for (int i = 11; i <= 19; i++) {
-        dp[to_string(i)] = 2;
-    }
-
-    for (int i = 21; i<= 26; i++) {
-        dp[to_string(i)] = 2;
-    }
-    for (int i = 27; i <= 99; i++) {
-        dp[to_string(i)] = 1;
-    }
-
     string s;
+    int temp;
+
     while (true) {
         cin >> s;
         if (s == "0") break;
-        cout << cnt(s) << endl;
+        int n = s.size();
+        vector<int> dp(n);
+        dp[0] = 1;
+        temp = stoi(s.substr(0, 2));
+        dp[1] = (temp <= 26 && s[1] != '0' ? 2 : 1);
+        if (temp > 26 && s[1] == '0') dp[1] = 0;
+
+        for (int i = 2; i < n; i++) {
+            temp = stoi(s.substr(i-1, 2));
+            if (temp == 0) continue;
+            if (s[i] != '0') {
+                if (temp <= 26 && s[i-1] != '0')
+                    dp[i] = dp[i-1] + dp[i-2];
+                else 
+                    dp[i] = dp[i-1];
+            } else {
+                if (temp <= 26) {
+                    dp[i] = dp[i-2];
+                }
+            }
+        }
+        cout << dp[n-1] << endl;
     }
     return 0;
 }
